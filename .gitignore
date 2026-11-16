@@ -1,6 +1,8 @@
 node_modules/
-dist/
-dist-extension/
+/dist/
+/dist-extension/
+!extension/dist/
+!extension/dist/coffre-linkedin.zip
 .env
 .env.*
 data.json

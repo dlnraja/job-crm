@@ -17,8 +17,10 @@ Manifest V3 extension for Chrome, Edge, and Firefox 128+. It only acts in the br
 
 ## Install
 
-1. Build `coffre-linkedin.zip` with `npm run build:extension`, or download it from the GitHub release `extension-v1.0.0`.
-2. Chrome or Edge: `chrome://extensions` or `edge://extensions`, turn on Developer mode, Load unpacked, and choose the unzipped folder. You can also drag the zip only after unzipping.
-3. Firefox: `about:debugging#/runtime/this-firefox`, Load Temporary Add-on, and pick `manifest.json`.
+The built archive is committed at [`extension/dist/coffre-linkedin.zip`](dist/coffre-linkedin.zip). The release workflow rebuilds it and, when the bytes change, commits that same path. The GitHub release `extension-v1.0.0` uploads that file as well: https://github.com/dlnraja/job-crm/releases/download/extension-v1.0.0/coffre-linkedin.zip
+
+1. Unzip `extension/dist/coffre-linkedin.zip`.
+2. Chrome or Edge: open `chrome://extensions` or `edge://extensions`, turn on Developer mode, choose **Load unpacked**, and select the unzipped folder.
+3. Firefox 128+: open `about:debugging#/runtime/this-firefox`, choose **Load Temporary Add-on**, and pick `manifest.json` inside the unzipped folder.
 
 Open the popup, set a passphrase, and keep the CRM tab https://dlnraja.github.io/job-crm/ open if you want status and offers to sync. The passphrase encrypts `chrome.storage.local` with the same AES-256-GCM / PBKDF2 scheme as the CRM. Gmail stays in the CRM's own Google sign-in; this extension does not ask LinkedIn or Google for tokens.

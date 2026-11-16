@@ -51,7 +51,7 @@ One-time cloud setup (Firebase Spark, Google OAuth client, Firestore rules, auth
 
 Automating LinkedIn breaks LinkedIn's User Agreement and can restrict or close the account. The extension in `extension/` only clicks and types in a normal, already logged-in browser tab. It does not call Voyager, does not read cookies or tokens, and does not run headless. Caps, delays, working hours, a warm-up, a dry-run default, and a kill switch reduce burstiness. **None of that guarantees the account will be left alone.** Details and install steps: [`extension/README.md`](extension/README.md).
 
-`npm run build:extension` writes `dist-extension/coffre-linkedin.zip`. On `main`, CI publishes that zip on the GitHub release `extension-v1.0.0`.
+The installable archive is committed at [`extension/dist/coffre-linkedin.zip`](extension/dist/coffre-linkedin.zip). Unzip it and load the folder as an unpacked extension (Chrome or Edge) or load `manifest.json` as a temporary add-on (Firefox 128+). `npm run build:extension` refreshes that file. On `main`, the release workflow commits it when the build changes and uploads the same zip to https://github.com/dlnraja/job-crm/releases/download/extension-v1.0.0/coffre-linkedin.zip.
 
 ## Develop
 

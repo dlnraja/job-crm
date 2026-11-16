@@ -45,7 +45,7 @@ export function renderLinkedIn(host: HTMLElement, ui: AppController) {
     h("section", { class: "panel" }, [
       h("h2", { text: "Installation" }),
       h("p", {
-        text: "Téléchargez coffre-linkedin.zip depuis la release GitHub extension-v1.0.0, ou lancez npm run build:extension. Dans Chrome ou Edge : Extensions, mode développeur, Chargez l'extension non empaquetée, dossier décompressé. Firefox : about:debugging, module temporaire, manifest.json.",
+        text: "Le zip versionné est extension/dist/coffre-linkedin.zip (même fichier que la release extension-v1.0.0). Décompressez-le. Chrome ou Edge : mode développeur, chargez le dossier. Firefox : about:debugging, module temporaire, manifest.json.",
       }),
       h("p", {
         class: "muted",

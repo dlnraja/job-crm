@@ -1,6 +1,10 @@
 import assert from "node:assert/strict";
+import { execFile } from "node:child_process";
 import { readFile, readdir } from "node:fs/promises";
+import { promisify } from "node:util";
 import test from "node:test";
+
+const execFileAsync = promisify(execFile);
 import { answerQuestion, normalizeQuestion, rememberAnswer } from "../src/lib/easy-apply.mjs";
 import { extractInterestLinks, extractJob, extractPeople } from "../src/lib/linkedin-extract.mjs";
 import {
@@ -187,4 +191,16 @@ test("extension source stays off Voyager, cookies and headless", async () => {
   assert.equal(blob.includes("chrome.cookies"), false);
   assert.equal(/headless/i.test(blob), false);
   assert.match(blob, /dryRun/);
+});
+
+test("committed extension zip contains the extension and no personal vault", async () => {
+  const zip = new URL("../extension/dist/coffre-linkedin.zip", import.meta.url);
+  const listed = await execFileAsync("unzip", ["-l", zip.pathname]);
+  assert.match(listed.stdout, /manifest\.json/);
+  assert.equal(listed.stdout.includes("data.enc.json"), false);
+  const dumped = await execFileAsync("unzip", ["-p", zip.pathname], { maxBuffer: 8 * 1024 * 1024 });
+  const text = dumped.stdout.toLowerCase();
+  assert.equal(text.includes("rajasekaram"), false);
+  assert.equal(text.includes("@gmail.com"), false);
+  assert.equal(text.includes("data.enc.json"), false);
 });
