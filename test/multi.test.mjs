@@ -4,6 +4,7 @@ import test from "node:test";
 import { canAccessUserPath } from "../src/lib/access.mjs";
 import { isFirebaseConfigured, isGoogleClientConfigured } from "../src/lib/config.mjs";
 import { planRefusalFollowUp } from "../src/lib/followup-drafts.mjs";
+import { GMAIL_READ_SCOPE, GMAIL_SEND_SCOPE, gmailScopes } from "../src/lib/gmail-scopes.mjs";
 import { applyInboxPlans, classifyMessage, planInboxUpdates } from "../src/lib/gmail-classify.mjs";
 import { buildPlainMessage, toBase64Url } from "../src/lib/gmail-mime.mjs";
 import { renderCoverLetter, tokenize } from "../src/lib/letters.mjs";
@@ -40,6 +41,16 @@ test("empty public config keeps the local vault mode", () => {
   );
   assert.equal(isGoogleClientConfigured({ clientId: "" }), false);
   assert.equal(isGoogleClientConfigured({ clientId: "123-abc.apps.googleusercontent.com" }), true);
+});
+
+test("committed Gmail client id is public and requests only readonly plus optional send", async () => {
+  const config = JSON.parse(await readFile(new URL("../public/google-config.json", import.meta.url), "utf8"));
+  assert.deepEqual(Object.keys(config), ["clientId"]);
+  assert.equal(config.clientId, "1021656979101-39mrneiv7imflrbvmusnketg8dth18ni.apps.googleusercontent.com");
+  assert.equal(isGoogleClientConfigured(config), true);
+  assert.equal(gmailScopes(false), GMAIL_READ_SCOPE);
+  assert.equal(gmailScopes(true), `${GMAIL_READ_SCOPE} ${GMAIL_SEND_SCOPE}`);
+  assert.equal(gmailScopes(true).includes("gmail.compose"), false);
 });
 
 test("classifies confirmations, refusals, interviews and bounces without a model", () => {

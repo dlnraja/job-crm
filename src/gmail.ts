@@ -1,6 +1,5 @@
-const READ_SCOPE = "https://www.googleapis.com/auth/gmail.readonly";
-const COMPOSE_SCOPE = "https://www.googleapis.com/auth/gmail.compose";
-const SEND_SCOPE = "https://www.googleapis.com/auth/gmail.send";
+import { gmailScopes } from "./lib/gmail-scopes.mjs";
+
 const MAX_MESSAGES = 25;
 const GAP_MS = 150;
 
@@ -49,7 +48,7 @@ export function loadGis(): Promise<void> {
 }
 
 export function requestGmailToken(clientId: string, allowSend: boolean): Promise<{ token: string; canSend: boolean }> {
-  const scope = [READ_SCOPE, COMPOSE_SCOPE, allowSend ? SEND_SCOPE : ""].filter(Boolean).join(" ");
+  const scope = gmailScopes(allowSend);
   return loadGis().then(
     () =>
       new Promise((resolve, reject) => {

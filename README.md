@@ -45,7 +45,7 @@ After changing data in the browser, use **Exporter JSON chiffré** and commit th
 
 With no Firebase config, the site stays in local-vault mode. The committed file opens with identifiant `dylan` and the passphrase used to encrypt it, not with the fictional demo password.
 
-One-time cloud setup (Firebase Spark, Google OAuth client, Firestore rules, authorized domain) is in [`docs/SETUP.md`](docs/SETUP.md). Placeholders live in `public/firebase-config.json` and `public/google-config.json`. Rules: `firestore.rules`.
+One-time cloud setup (Firebase Spark, Google OAuth client, Firestore rules, authorized domain) is in [`docs/SETUP.md`](docs/SETUP.md). The public web config is in `public/firebase-config.json`. The public Gmail OAuth client id (no secret) is in `public/google-config.json`. Rules: `firestore.rules`.
 
 ## LinkedIn extension
 

@@ -407,7 +407,7 @@ class CrmApp implements AppController {
       this.gmailCanSend = granted.canSend;
       this.gmailNote = granted.canSend
         ? "Gmail connecté, envoi inclus. Rien n'est envoyé sans un clic."
-        : "Gmail connecté en lecture et brouillons.";
+        : "Gmail connecté en lecture.";
     } catch {
       this.gmailNote = "Connexion Gmail annulée ou refusée.";
     }

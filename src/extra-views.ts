@@ -139,7 +139,7 @@ export function renderGmail(host: HTMLElement, ui: AppController) {
       h("div", {}, [h("p", { class: "eyebrow", text: "Boîte mail" }), h("h1", { text: "Gmail" })]),
       h("p", {
         class: "lede",
-        text: "Lecture seule et brouillons. L'envoi n'existe que si la case est cochée avant la connexion, puis au clic Envoyer dans Relances. Au plus 25 messages, un par un.",
+        text: "Lecture (gmail.readonly). Cochez l'envoi pour demander aussi gmail.send avant de connecter. Rien ne part sans le clic Envoyer dans Relances. Au plus 25 messages, un par un.",
       }),
     ]),
     h("div", { class: "row-actions" }, [

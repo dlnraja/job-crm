@@ -2,12 +2,12 @@
 
 The site works with no accounts: the local screen decrypts `data/data.enc.json` with identifiant `dylan` and the password used when that file was encrypted. The fictional seed in `scripts/demo-data.mjs` is a different file and is not what the site loads. The steps below turn on multi-user storage and Gmail. They use only free tiers. No card, no paid API, no LLM.
 
-Committed config files stay empty until you paste your own public values:
+The public values are already committed:
 
-- `public/firebase-config.json`
-- `public/google-config.json`
+- `public/firebase-config.json` — Firebase web config for `job-crm-dlnraja`
+- `public/google-config.json` — Gmail OAuth web client id only
 
-Those values are public by design (they ship in the static site). Security is Firestore rules plus client-side AES-256-GCM. The vault passphrase is never sent to Firebase.
+Those values are public by design (they ship in the static site). There is no OAuth client secret in the repo, and none should be added. Security is Firestore rules plus client-side AES-256-GCM. The vault passphrase is never sent to Firebase.
 
 ## 1. Firebase (Spark)
 
@@ -43,19 +43,13 @@ LinkedIn sign-in is not wired: LinkedIn's current OIDC flow needs a client secre
 
 1. https://console.cloud.google.com/ → the same project Firebase created, or a new one.
 2. APIs & Services → Library → enable **Gmail API**.
-3. OAuth consent screen. User type **External**. Publishing status **Testing**. Add the scopes `gmail.readonly`, `gmail.compose`, and, only if you want the explicit send button, `gmail.send`. Add your Google account under **Test users**. While the app stays in Testing, only those users can connect, and no verification review is required.
+3. OAuth consent screen. User type **External**. Publishing status **Testing**. The scopes on this client are `gmail.readonly` and `gmail.send`. `gmail.compose` is not enabled, and the app does not request it. Add your Google account under **Test users**. While the app stays in Testing, only those users can connect, and no verification review is required.
 4. APIs & Services → Credentials → Create OAuth client ID → **Web application**.
-   - Authorized JavaScript origins: `https://dlnraja.github.io` and, for local dev, `http://localhost:5173` and `http://127.0.0.1:4173`.
-   - No client secret is used. Do not create a server flow.
-5. Put the client id in `public/google-config.json`:
+   - Authorized JavaScript origins: `https://dlnraja.github.io` and `http://localhost:5173`.
+   - No client secret is used. Do not create a server flow, and do not commit a secret.
+5. The client id is already in `public/google-config.json`. It must end with `.apps.googleusercontent.com`.
 
-```json
-{ "clientId": "….apps.googleusercontent.com" }
-```
-
-6. Commit and redeploy.
-
-In the app, **Gmail → Connecter**. The token stays in the tab. Scan reads at most 25 recent messages, one request at a time, and stops if Gmail returns 429. Classification is keyword/regex only. **Appliquer au coffre** writes statuses, timeline entries, and bounced contacts. **Relances → Remerciement** creates a draft (Gmail draft if connected). **Envoyer** calls `gmail.send` only when that scope was checked before connecting and you click the button.
+In the app, **Gmail → Connecter Gmail**. The token stays in the tab. The button sends that public client id to Google Identity Services with `gmail.readonly`, plus `gmail.send` only when **Autoriser aussi l'envoi** is checked first. Scan reads at most 25 recent messages, one request at a time, and stops if Gmail returns 429. Classification is keyword/regex only. **Appliquer au coffre** writes statuses, timeline entries, and bounced contacts. **Relances → Remerciement** keeps the thank-you in the vault. **Envoyer** calls `gmail.send` only when that scope was checked before connecting and you click the button.
 
 ## 3. GitHub Pages
 
