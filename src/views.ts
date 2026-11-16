@@ -1,6 +1,7 @@
 import { barFigure, donutFigure } from "./charts";
 import { externalLink, field, formatDate, formatRate, formatWhen, gmailHref, h } from "./dom";
 import { fold, guessEmails, PATTERN_LABELS } from "./lib/email-guesser.mjs";
+import { confidenceFor, lookupMx } from "./lib/mx.mjs";
 import { followUpFindings } from "./lib/followups.mjs";
 import {
   deliveryLabel,
@@ -51,6 +52,9 @@ const NAV: Array<{ id: ViewName; label: string }> = [
   { id: "contacts", label: "Contacts" },
   { id: "emails", label: "Devineur d'e-mails" },
   { id: "relances", label: "Relances" },
+  { id: "lettres", label: "Lettres" },
+  { id: "gmail", label: "Gmail" },
+  { id: "profil", label: "Profil" },
 ];
 
 export function renderNav(current: ViewName, go: (view: ViewName) => void): HTMLElement {
@@ -613,6 +617,8 @@ export function renderContacts(host: HTMLElement, ui: AppController): void {
 export function renderGuesser(host: HTMLElement, ui: AppController): void {
   const results = h("div", { class: "guess-results" });
   const bouncedNote = h("p", { class: "callout" });
+  const mxNote = h("p", { class: "muted" });
+  let lastRows: Array<{ email: string; pattern: string; support: number; bounced: boolean; reason: string }> = [];
   const domain = h("input", { attrs: { name: "domain", required: "true", autocomplete: "off", spellcheck: "false" } });
   const samples = h("textarea", { attrs: { name: "samples", rows: "5", spellcheck: "false" } });
   const company = h(
@@ -640,7 +646,25 @@ export function renderGuesser(host: HTMLElement, ui: AppController): void {
     field("Nom", h("input", { attrs: { name: "lastName", required: "true", autocomplete: "off" } })),
     field("Domaine", domain),
     field("Adresses connues (prénom nom adresse, une par ligne)", samples),
-    h("button", { class: "primary", text: "Proposer des adresses", attrs: { type: "submit" } }),
+    h("div", { class: "row-actions" }, [
+      h("button", { class: "primary", text: "Proposer des adresses", attrs: { type: "submit" } }),
+      h("button", {
+        class: "ghost",
+        text: "Vérifier le MX",
+        attrs: { type: "button" },
+        on: {
+          click: () => {
+            mxNote.textContent = "Requête DNS en cours…";
+            void lookupMx(domain.value).then((mx) => {
+              mxNote.textContent = mx.ok
+                ? `MX trouvé : ${mx.hosts.join(", ")}.`
+                : `Pas de MX utilisable (${mx.error}). Les scores baissent.`;
+              if (lastRows.length) results.replaceChildren(renderGuessRows(lastRows, mx));
+            });
+          },
+        },
+      }),
+    ]),
   ]);
   form.addEventListener("submit", (event) => {
     event.preventDefault();
@@ -657,6 +681,7 @@ export function renderGuesser(host: HTMLElement, ui: AppController): void {
       samples: parsed,
       bouncedPatterns: bounced,
     });
+    lastRows = rows;
     results.replaceChildren(renderGuessRows(rows));
   });
   host.append(
@@ -672,6 +697,7 @@ export function renderGuesser(host: HTMLElement, ui: AppController): void {
     ]),
     bouncedNote,
     form,
+    mxNote,
     results,
   );
 }
@@ -691,7 +717,10 @@ function parseSamples(text: string): Array<{ firstName: string; lastName: string
   return rows;
 }
 
-function renderGuessRows(rows: Array<{ email: string; pattern: string; support: number; bounced: boolean; reason: string }>): HTMLElement {
+function renderGuessRows(
+  rows: Array<{ email: string; pattern: string; support: number; bounced: boolean; reason: string }>,
+  mx?: { ok: boolean },
+): HTMLElement {
   if (!rows.length) return h("p", { class: "muted", text: "Aucune adresse à proposer. Vérifiez le prénom, le nom et le domaine." });
   return h("ol", { class: "guess-list" }, rows.map((row, index) => {
     const copy = h("button", {
@@ -715,7 +744,10 @@ function renderGuessRows(rows: Array<{ email: string; pattern: string; support: 
       h("span", { class: "rank", text: String(index + 1) }),
       h("div", {}, [
         h("strong", { text: row.email }),
-        h("span", { class: "muted", text: `${PATTERN_LABELS[row.pattern] ?? row.pattern} · ${row.reason}` }),
+        h("span", {
+          class: "muted",
+          text: `${PATTERN_LABELS[row.pattern] ?? row.pattern} · confiance ${confidenceFor(row, index, mx)} · ${row.reason}`,
+        }),
         row.bounced ? h("span", { class: "pill", attrs: { "data-email": "bounced" }, text: "Modèle déjà en rebond" }) : null,
       ]),
       copy,
@@ -725,14 +757,16 @@ function renderGuessRows(rows: Array<{ email: string; pattern: string; support: 
 
 export function renderRelances(host: HTMLElement, ui: AppController): void {
   const findings = followUpFindings(ui.data.followUps);
+  const actionNote = h("p", { class: "muted" });
   host.append(
     h("header", { class: "view-head" }, [
       h("div", {}, [
         h("p", { class: "eyebrow", text: "Journal" }),
         h("h1", { text: "Relances" }),
       ]),
-      h("p", { class: "lede", text: "Une seule relance par offre. Pas de doublon (même date, même objet, mêmes destinataires), et un identifiant Gmail ne sert qu'une fois." }),
+      h("p", { class: "lede", text: "Une seule relance par offre. Un refus peut préparer un remerciement (brouillon) : l'envoi ne part qu'au clic sur Envoyer." }),
     ]),
+    actionNote,
     h("section", { class: findings.length ? "callout is-warn" : "callout" }, [
       h("h2", { text: findings.length ? "Règles non respectées" : "Règles respectées" }),
       findings.length
@@ -750,7 +784,7 @@ export function renderRelances(host: HTMLElement, ui: AppController): void {
     h("div", { class: "table-wrap" }, [
       h("table", { class: "grid" }, [
         h("thead", {}, [
-          h("tr", {}, ["Date", "Offre", "À", "Cc", "Objet", "Distribution", "Réponse", "Gmail"].map((label) => h("th", { text: label, attrs: { scope: "col" } }))),
+          h("tr", {}, ["Date", "Offre", "À", "Cc", "Objet", "Distribution", "Réponse", "Gmail", "Action"].map((label) => h("th", { text: label, attrs: { scope: "col" } }))),
         ]),
         h(
           "tbody",
@@ -772,9 +806,45 @@ export function renderRelances(host: HTMLElement, ui: AppController): void {
               h("td", { text: item.to.join(", ") }),
               h("td", { text: item.cc.length ? item.cc.join(", ") : "—" }),
               h("td", { text: item.subject }),
-              h("td", {}, [h("span", { class: "pill", attrs: { "data-email": item.delivery === "bounced" ? "bounced" : "verified" }, text: deliveryLabel(item.delivery) })]),
+              h("td", {}, [
+                h("span", {
+                  class: "pill",
+                  attrs: { "data-email": item.state === "draft" ? "guessed" : item.delivery === "bounced" ? "bounced" : "verified" },
+                  text: item.state === "draft" ? "Brouillon" : deliveryLabel(item.delivery),
+                }),
+              ]),
               h("td", { text: item.replyReceived ? "Oui" : "Non" }),
               h("td", {}, item.gmailMessageId ? [externalLink(gmailHref(item.gmailMessageId), "Ouvrir")] : [h("span", { text: "—" })]),
+              h("td", {}, [
+                application?.status === "refus"
+                  ? h("button", {
+                      class: "linkish",
+                      text: "Remerciement",
+                      attrs: { type: "button" },
+                      on: {
+                        click: () => {
+                          void ui.prepareRefusalFollowUp(application.id).then((message) => {
+                            actionNote.textContent = message;
+                          });
+                        },
+                      },
+                    })
+                  : h("span", { class: "muted", text: "—" }),
+                item.state === "draft"
+                  ? h("button", {
+                      class: "linkish",
+                      text: "Envoyer",
+                      attrs: { type: "button" },
+                      on: {
+                        click: () => {
+                          void ui.sendDraft(item.id).then((message) => {
+                            actionNote.textContent = message;
+                          });
+                        },
+                      },
+                    })
+                  : null,
+              ]),
             ]);
           }),
         ),

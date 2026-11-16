@@ -25,7 +25,8 @@ The key is PBKDF2-SHA256 (≥ 600 000 iterations) over the UTF-8 bytes of `NFC(t
 {
   schemaVersion: 1,
   updatedAt: string,          // ISO-8601
-  auth: { username: string }, // required, non-empty after trim
+  auth: { username: string }, // required. Local vault: the identifiant. Account vault: the Firebase uid.
+  profile?: Profile,          // optional. Facts used by the letter templates. Never invented.
   companies: Company[],
   contacts: Contact[],
   applications: Application[],

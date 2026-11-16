@@ -37,7 +37,7 @@ export function hasReply(application, followUps) {
 
 export function computeKpis(data) {
   const applications = data.applications ?? [];
-  const followUps = data.followUps ?? [];
+  const followUps = (data.followUps ?? []).filter((item) => item.state !== "draft");
   const sent = applications.filter(isSent);
   const responded = sent.filter((application) => hasReply(application, followUps));
   return {

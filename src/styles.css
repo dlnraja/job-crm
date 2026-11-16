@@ -174,6 +174,21 @@ table.grid { width: 100%; border-collapse: collapse; min-width: 860px; }
 .guess-list li > div { display: grid; gap: 0.15rem; flex: 1; }
 .guess-list .rank { font-family: var(--serif); font-size: 1.3rem; width: 1.6rem; }
 .guess-list .is-bounced { border-color: #e4c2c2; }
+.gate-stack { display: grid; gap: 1rem; }
+.stack { display: grid; gap: 0.8rem; }
+.row-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
+.check { display: flex; gap: 0.45rem; align-items: center; }
+.wide { width: 100%; }
+.letter {
+  white-space: pre-wrap;
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 1rem;
+  margin: 0;
+  max-height: 28rem;
+  overflow: auto;
+}
 .colophon { padding: 0 1.2rem 1.2rem; font-size: 0.8rem; }
 .pick-hint { margin-top: -0.2rem; }
 

@@ -13,7 +13,7 @@ export type CompanyGroup = "cac40" | "sbf120" | "sp500" | "public" | "autre";
 export type EmailStatus = "published" | "guessed" | "verified" | "bounced";
 export type Delivery = "delivered" | "bounced";
 export type InterviewKind = "screening" | "rh" | "manager" | "final";
-export type ViewName = "tableau" | "suivi" | "contacts" | "emails" | "relances";
+export type ViewName = "tableau" | "suivi" | "contacts" | "emails" | "relances" | "lettres" | "gmail" | "profil";
 export type SortKey =
   | "company"
   | "role"
@@ -115,6 +115,27 @@ export interface FollowUp {
   gmailMessageId?: string | null;
   delivery: Delivery;
   replyReceived: boolean;
+  state?: "draft" | "sent";
+  body?: string;
+}
+
+export interface Experience {
+  id: string;
+  title: string;
+  organization: string;
+  start?: string;
+  end?: string;
+  facts: string[];
+}
+
+export interface Profile {
+  fullName: string;
+  headline: string;
+  location: string;
+  linkedinUrl: string;
+  experiences: Experience[];
+  skills: string[];
+  achievements: string[];
 }
 
 export interface CrmData {
@@ -127,6 +148,7 @@ export interface CrmData {
   followUps: FollowUp[];
   emailSamples: EmailSample[];
   bouncedPatterns: BouncedPattern[];
+  profile?: Profile;
 }
 
 export type ApplicationPatch = Partial<
@@ -155,4 +177,20 @@ export interface AppController {
   company(id: string): Company | undefined;
   application(id: string): Application | undefined;
   go(view: ViewName, applicationId?: string): void;
+  cloud: boolean;
+  gmailReady: boolean;
+  gmailNote: string;
+  accountEmail: string;
+  letterText: string;
+  letterHtml: string;
+  updateProfile(profile: Profile): Promise<void>;
+  importJobLines(text: string): Promise<number>;
+  generateLetter(offer: string, applicationId: string): void;
+  connectGmail(allowSend: boolean): Promise<void>;
+  scanGmail(): Promise<void>;
+  applyGmail(): Promise<void>;
+  gmailSummary: string;
+  prepareRefusalFollowUp(applicationId: string): Promise<string>;
+  sendDraft(followUpId: string): Promise<string>;
+  importExistingVault(username: string, password: string, fileText: string, replace: boolean): Promise<void>;
 }

@@ -4,6 +4,24 @@ export function demoPlaintext() {
     schemaVersion: 1,
     updatedAt: "2026-11-16T09:00:00.000Z",
     auth: { username: "demo" },
+    profile: {
+      fullName: "Camille Martin",
+      headline: "Exemple de parcours",
+      location: "Lyon",
+      linkedinUrl: "https://www.linkedin.com/in/exemple-camille-martin",
+      skills: ["analyse de risques", "conformité"],
+      achievements: ["Tableau de bord de risques fictif"],
+      experiences: [
+        {
+          id: "xp1",
+          title: "Analyste",
+          organization: "Atelier Exemple",
+          start: "2020",
+          end: "2026",
+          facts: ["Analyse de risques documentaires pour des organisations fictives"],
+        },
+      ],
+    },
     companies: [
       {
         id: "co_phare",

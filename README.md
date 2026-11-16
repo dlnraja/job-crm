@@ -42,6 +42,12 @@ rm -f /tmp/job-crm-demo.json
 
 After changing data in the browser, use **Exporter JSON chiffré** and commit that file as `data/data.enc.json`. **Exporter CSV** downloads a spreadsheet of the tracker. **Oublier la copie locale** drops the `localStorage` copy only.
 
+## Accounts, Gmail, letters
+
+With no Firebase config, the site stays in local-vault mode. The published file still opens with identifiant `demo` and password `demo-only-public`.
+
+One-time cloud setup (Firebase Spark, Google OAuth client, Firestore rules, authorized domain) is in [`docs/SETUP.md`](docs/SETUP.md). Placeholders live in `public/firebase-config.json` and `public/google-config.json`. Rules: `firestore.rules`.
+
 ## Develop
 
 ```bash
