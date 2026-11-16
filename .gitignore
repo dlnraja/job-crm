@@ -1,0 +1,13 @@
+node_modules/
+dist/
+.env
+.env.*
+data.json
+*.plain.json
+*.plaintext.json
+plaintext/
+data/*
+!data/data.enc.json
+.DS_Store
+coverage/
+*.log
