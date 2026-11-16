@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <title>Coffre LinkedIn</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <h1>Coffre LinkedIn</h1>
+    <p class="warn">Automatiser LinkedIn contrevient à ses conditions. Aucune limite ici ne garantit l'absence de restriction.</p>
+    <form id="unlock">
+      <label>Phrase secrète <input id="pass" type="password" required /></label>
+      <button type="submit">Ouvrir</button>
+    </form>
+    <pre id="safety"></pre>
+    <button id="kill" type="button">Arrêt d'urgence</button>
+    <p id="note"></p>
+    <script src="popup.js" type="module"></script>
+  </body>
+</html>

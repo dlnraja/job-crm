@@ -13,7 +13,7 @@ export type CompanyGroup = "cac40" | "sbf120" | "sp500" | "public" | "autre";
 export type EmailStatus = "published" | "guessed" | "verified" | "bounced";
 export type Delivery = "delivered" | "bounced";
 export type InterviewKind = "screening" | "rh" | "manager" | "final";
-export type ViewName = "tableau" | "suivi" | "contacts" | "emails" | "relances" | "lettres" | "gmail" | "profil";
+export type ViewName = "tableau" | "suivi" | "contacts" | "emails" | "relances" | "lettres" | "gmail" | "profil" | "linkedin";
 export type SortKey =
   | "company"
   | "role"
@@ -193,4 +193,7 @@ export interface AppController {
   prepareRefusalFollowUp(applicationId: string): Promise<string>;
   sendDraft(followUpId: string): Promise<string>;
   importExistingVault(username: string, password: string, fileText: string, replace: boolean): Promise<void>;
+  linkedinStatus: string;
+  linkedinSafety: string;
+  postToExtension(message: Record<string, unknown>): void;
 }

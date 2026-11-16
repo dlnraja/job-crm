@@ -1,0 +1,59 @@
+{
+  "manifest_version": 3,
+  "name": "Coffre LinkedIn",
+  "version": "1.0.0",
+  "description": "Compagnon local pour le CRM Coffre. Actions visibles, plafonds bas, mode répétition par défaut.",
+  "permissions": ["storage"],
+  "host_permissions": [
+    "https://www.linkedin.com/*",
+    "https://dlnraja.github.io/*",
+    "http://127.0.0.1/*",
+    "http://localhost/*"
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "action": {
+    "default_title": "Coffre LinkedIn",
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://www.linkedin.com/*"],
+      "js": ["content/guard.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://www.linkedin.com/jobs/*"],
+      "js": ["content/jobs.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://www.linkedin.com/messaging/*"],
+      "js": ["content/messaging.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://dlnraja.github.io/job-crm/*",
+        "http://127.0.0.1/*",
+        "http://localhost/*"
+      ],
+      "js": ["content/bridge.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["lib/*"],
+      "matches": ["https://www.linkedin.com/*", "https://dlnraja.github.io/*"]
+    }
+  ],
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "coffre-linkedin@dlnraja.github.io",
+      "strict_min_version": "128.0"
+    }
+  }
+}

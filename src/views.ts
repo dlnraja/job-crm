@@ -55,6 +55,7 @@ const NAV: Array<{ id: ViewName; label: string }> = [
   { id: "lettres", label: "Lettres" },
   { id: "gmail", label: "Gmail" },
   { id: "profil", label: "Profil" },
+  { id: "linkedin", label: "LinkedIn" },
 ];
 
 export function renderNav(current: ViewName, go: (view: ViewName) => void): HTMLElement {

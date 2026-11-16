@@ -1,0 +1,7 @@
+body { width: 320px; margin: 0; padding: 12px; font: 13px system-ui; color: #1c1915; background: #f3ecdf; }
+h1 { font-size: 18px; margin: 0 0 8px; }
+.warn { background: #fdeeee; border: 1px solid #e4c2c2; border-radius: 8px; padding: 8px; }
+label { display: grid; gap: 4px; margin: 8px 0; }
+input, button { font: inherit; }
+button { border-radius: 999px; border: 0; background: #0a3f3b; color: #f6f1e7; padding: 6px 10px; }
+pre { white-space: pre-wrap; }

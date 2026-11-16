@@ -6,6 +6,55 @@ export function blankProfile(): Profile {
   return { fullName: "", headline: "", location: "", linkedinUrl: "", experiences: [], skills: [], achievements: [] };
 }
 
+export function renderLinkedIn(host: HTMLElement, ui: AppController) {
+  ui.postToExtension({ type: "status" });
+  if (ui.data.profile) ui.postToExtension({ type: "profile", profile: ui.data.profile });
+  host.append(
+    h("header", { class: "view-head" }, [
+      h("div", {}, [h("p", { class: "eyebrow", text: "Navigateur" }), h("h1", { text: "LinkedIn" })]),
+      h("p", {
+        class: "lede",
+        text: "L'extension agit seulement dans votre session LinkedIn déjà ouverte. Elle n'appelle pas l'API Voyager et ne lit pas les cookies. Aucun garde-fou n'annule le risque de restriction.",
+      }),
+    ]),
+    h("section", { class: "callout is-warn" }, [
+      h("h2", { text: "Conditions LinkedIn" }),
+      h("p", {
+        text: "Automatiser LinkedIn contrevient à son contrat d'utilisation et peut restreindre le compte. Vous l'exécutez à vos risques. Le mode répétition est le défaut : rien n'est envoyé tant que vous n'activez pas chaque action.",
+      }),
+    ]),
+    h("section", { class: "panel" }, [
+      h("h2", { text: "Extension" }),
+      h("p", { text: ui.linkedinStatus }),
+      h("pre", { class: "letter", text: ui.linkedinSafety || "Compteurs indisponibles tant que l'extension n'est pas ouverte." }),
+      h("div", { class: "row-actions" }, [
+        h("button", {
+          class: "primary",
+          text: "Arrêt d'urgence",
+          attrs: { type: "button" },
+          on: { click: () => ui.postToExtension({ type: "kill", on: true }) },
+        }),
+        h("button", {
+          class: "ghost",
+          text: "Rafraîchir",
+          attrs: { type: "button" },
+          on: { click: () => ui.postToExtension({ type: "status" }) },
+        }),
+      ]),
+    ]),
+    h("section", { class: "panel" }, [
+      h("h2", { text: "Installation" }),
+      h("p", {
+        text: "Téléchargez coffre-linkedin.zip depuis la release GitHub extension-v1.0.0, ou lancez npm run build:extension. Dans Chrome ou Edge : Extensions, mode développeur, Chargez l'extension non empaquetée, dossier décompressé. Firefox : about:debugging, module temporaire, manifest.json.",
+      }),
+      h("p", {
+        class: "muted",
+        text: "Gmail reste dans l'onglet Gmail du CRM (jeton Google du navigateur). L'extension ne demande pas de jeton LinkedIn.",
+      }),
+    ]),
+  );
+}
+
 export function renderLetters(host: HTMLElement, ui: AppController) {
   const offer = h("textarea", { attrs: { rows: "8", name: "offer" } });
   const select = h(

@@ -1,0 +1,52 @@
+name: Package LinkedIn extension
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: 20
+          cache: npm
+      - name: Install
+        run: npm ci
+      - name: Test
+        run: npm test
+      - name: Build extension zip
+        run: npm run build:extension
+      - name: Upload zip
+        uses: actions/upload-artifact@v4
+        with:
+          name: coffre-linkedin
+          path: dist-extension/coffre-linkedin.zip
+
+  release:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: package
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download zip
+        uses: actions/download-artifact@v4
+        with:
+          name: coffre-linkedin
+          path: dist-extension
+      - name: Publish GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view extension-v1.0.0 >/dev/null 2>&1 || gh release create extension-v1.0.0 --title "Coffre LinkedIn 1.0.0" --notes "Unpacked Manifest V3 extension. Automating LinkedIn breaks its User Agreement. See extension/README.md. No safeguard guarantees zero risk."
+          gh release upload extension-v1.0.0 dist-extension/coffre-linkedin.zip --clobber

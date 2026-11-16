@@ -10,7 +10,8 @@
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview --host 127.0.0.1 --port 4173 --strictPort",
-    "test": "node --test test/crypto.test.mjs test/email-guesser.test.mjs test/logic.test.mjs test/privacy.test.mjs test/multi.test.mjs",
+    "test": "node --test test/crypto.test.mjs test/email-guesser.test.mjs test/logic.test.mjs test/privacy.test.mjs test/multi.test.mjs test/linkedin-extension.test.mjs",
+    "build:extension": "node scripts/build-extension.mjs",
     "encrypt": "node scripts/encrypt.mjs",
     "decrypt": "node scripts/decrypt.mjs"
   },

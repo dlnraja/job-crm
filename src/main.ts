@@ -14,12 +14,12 @@ import type { Auth } from "firebase/auth";
 import type { Firestore } from "firebase/firestore";
 import type * as Cloud from "./cloud";
 import { createGmailDraft, requestGmailToken, scanInbox, sendGmailMessage } from "./gmail";
-import { renderGmail, renderLetters, renderProfile } from "./extra-views";
+import { renderGmail, renderLetters, renderLinkedIn, renderProfile } from "./extra-views";
 import type { ApplicationPatch, AppController, CrmData, Profile, SortKey, ViewName } from "./types";
 import { renderContacts, renderDashboard, renderGuesser, renderNav, renderRelances, renderTracker } from "./views";
 
 const LOCAL_KEY = "job-crm.local.enc.v1";
-const VIEWS: ViewName[] = ["tableau", "suivi", "contacts", "emails", "relances", "lettres", "gmail", "profil"];
+const VIEWS: ViewName[] = ["tableau", "suivi", "contacts", "emails", "relances", "lettres", "gmail", "profil", "linkedin"];
 
 function viewFromHash(): ViewName {
   const name = location.hash.replace(/^#/, "");
@@ -60,6 +60,8 @@ class CrmApp implements AppController {
   letterHtml = "";
   gmailNote = "";
   gmailSummary = "";
+  linkedinStatus = "Extension non détectée. Ouvrez cette page dans Chrome ou Edge avec l'extension chargée.";
+  linkedinSafety = "";
 
   constructor(root: HTMLElement) {
     this.root = root;
@@ -68,7 +70,69 @@ class CrmApp implements AppController {
       if (this.session) this.render();
     });
     this.render();
+    window.addEventListener("message", (event) => this.onExtensionMessage(event));
     void this.boot();
+  }
+
+  postToExtension(message: Record<string, unknown>) {
+    window.postMessage({ source: "coffre-crm", ...message }, location.origin);
+  }
+
+  private async ingestLinkedInOffer(job: { id?: string; title?: string; company?: string; location?: string; salary?: string; url?: string; description?: string }) {
+    if (!job.id) return;
+    const url = job.url || `https://www.linkedin.com/jobs/view/${job.id}/`;
+    if (this.data.applications.some((item) => item.linkedinJobUrl === url || item.id === `app_li_${job.id}`)) return;
+    let companyId = "";
+    if (job.company) {
+      const existing = this.data.companies.find((item) => item.name === job.company);
+      if (existing) companyId = existing.id;
+      else {
+        companyId = `co_li_${job.id}`;
+        this.data.companies.push({ id: companyId, name: job.company, domain: "", group: "autre" });
+      }
+    }
+    this.data.applications.push({
+      id: `app_li_${job.id}`,
+      companyId,
+      role: job.title || "Offre LinkedIn",
+      location: job.location || "",
+      salary: job.salary || null,
+      source: "linkedin",
+      dateApplied: null,
+      status: "a_preparer",
+      priority: "moyenne",
+      urgency: "normale",
+      nextAction: "Relire l'offre importée",
+      nextActionDate: null,
+      offerUrl: url,
+      linkedinJobUrl: url,
+      gmailMessageIds: [],
+      cvFile: null,
+      letterFile: null,
+      contactIds: [],
+      notes: (job.description || "").slice(0, 600),
+      interviews: [],
+      events: [{ id: crypto.randomUUID(), at: new Date().toISOString(), kind: "note", summary: "Importée depuis l'extension LinkedIn." }],
+    });
+    this.data.updatedAt = new Date().toISOString();
+    await this.persist();
+    if (this.view === "linkedin" || this.view === "suivi") this.renderMain();
+  }
+
+  private onExtensionMessage(event: MessageEvent) {
+    if (event.origin !== location.origin) return;
+    const data = event.data;
+    if (!data || data.source !== "coffre-extension") return;
+    if (data.type === "status") {
+      const summary = data.summary || "Extension connectée.";
+      const safety = data.safetyText || "";
+      const changed = summary !== this.linkedinStatus || safety !== this.linkedinSafety;
+      this.linkedinStatus = summary;
+      this.linkedinSafety = safety;
+      if (data.warning) this.banner = String(data.warning);
+      if (changed && this.view === "linkedin" && this.session) this.renderMain();
+    }
+    if (data.type === "offer" && data.job && this.session) void this.ingestLinkedInOffer(data.job);
   }
 
   get cloud() {
@@ -706,6 +770,7 @@ class CrmApp implements AppController {
     else if (this.view === "relances") renderRelances(main as HTMLElement, this);
     else if (this.view === "lettres") renderLetters(main as HTMLElement, this);
     else if (this.view === "gmail") renderGmail(main as HTMLElement, this);
+    else if (this.view === "linkedin") renderLinkedIn(main as HTMLElement, this);
     else renderProfile(main as HTMLElement, this);
     if (focusId) {
       const next = main.querySelector(`[data-focus="${CSS.escape(focusId)}"]`);
