@@ -43,7 +43,7 @@ class CrmApp implements AppController {
     salt: string;
     iterations: number;
   } | null = null;
-  private usernameDraft = "demo";
+  private usernameDraft = "dylan";
   private loginError = "";
   private busy = false;
   private banner = "";
@@ -578,7 +578,7 @@ class CrmApp implements AppController {
       this.loginError ? h("p", { class: "error", text: this.loginError, attrs: { role: "alert" } }) : null,
       h("p", {
         class: "demo-note",
-        text: "Démonstration publique : identifiant demo, mot de passe demo-only-public. Le fichier publié s'ouvre avec cet identifiant, pas avec un autre.",
+        text: "Le coffre publié s'ouvre avec l'identifiant dylan et le mot de passe choisi au chiffrement. Un autre couple n'affiche rien.",
       }),
     ]);
     form.addEventListener("submit", (event) => {

@@ -4,12 +4,19 @@ Static job-search CRM for one person. The site is French. The vault is one file,
 
 The repository is public. Do not commit `data.json` or any other plaintext export. `.gitignore` already excludes them.
 
-## Demo login (public, fictional data only)
+## Opening the committed vault
 
-These credentials are **demo-only**. They open a made-up vault (Phare & Cie, Banque du Quai, and other invented names). Replace the file before storing anything real.
+`data/data.enc.json` is ciphertext. It does **not** open with the fictional demo password. The local screen asks for the identifiant and password that were used when that file was encrypted. For this vault the identifiant is `dylan`. A wrong pair shows "Identifiants incorrects." and nothing else.
 
-- Username: `demo`
-- Password: `demo-only-public`
+`scripts/demo-data.mjs` is a separate fictional seed (Phare & Cie and similar). It is not the committed vault. To build a throwaway file from it:
+
+```bash
+node --input-type=module -e 'import { writeFileSync } from "node:fs"; import { demoPlaintext } from "./scripts/demo-data.mjs"; writeFileSync("/tmp/job-crm-demo.json", JSON.stringify(demoPlaintext()));'
+CRM_PASSWORD='demo-only-public' node scripts/encrypt.mjs /tmp/job-crm-demo.json /tmp/job-crm-demo.enc.json
+rm -f /tmp/job-crm-demo.json
+```
+
+That demo file, and only that file, opens with identifiant `demo` and password `demo-only-public`.
 
 ## Regenerate `data/data.enc.json`
 
@@ -30,21 +37,13 @@ export CRM_USERNAME='the-username-inside-auth.username'
 node scripts/decrypt.mjs data/data.enc.json
 ```
 
-Decrypt prints JSON to stdout and a generic error if the username or password is wrong. Both scripts use Node 20 built-ins only.
-
-To rebuild the committed fictional vault:
-
-```bash
-node --input-type=module -e 'import { writeFileSync } from "node:fs"; import { demoPlaintext } from "./scripts/demo-data.mjs"; writeFileSync("/tmp/job-crm-demo.json", JSON.stringify(demoPlaintext()));'
-CRM_PASSWORD='demo-only-public' node scripts/encrypt.mjs /tmp/job-crm-demo.json data/data.enc.json
-rm -f /tmp/job-crm-demo.json
-```
+Decrypt prints JSON to stdout and a generic error if the username or password is wrong. Both scripts use Node 20 built-ins only. Do not point the output at `data/data.enc.json` unless you mean to replace the committed vault.
 
 After changing data in the browser, use **Exporter JSON chiffré** and commit that file as `data/data.enc.json`. **Exporter CSV** downloads a spreadsheet of the tracker. **Oublier la copie locale** drops the `localStorage` copy only.
 
 ## Accounts, Gmail, letters
 
-With no Firebase config, the site stays in local-vault mode. The published file still opens with identifiant `demo` and password `demo-only-public`.
+With no Firebase config, the site stays in local-vault mode. The committed file opens with identifiant `dylan` and the passphrase used to encrypt it, not with the fictional demo password.
 
 One-time cloud setup (Firebase Spark, Google OAuth client, Firestore rules, authorized domain) is in [`docs/SETUP.md`](docs/SETUP.md). Placeholders live in `public/firebase-config.json` and `public/google-config.json`. Rules: `firestore.rules`.
 

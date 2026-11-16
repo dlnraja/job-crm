@@ -1,6 +1,6 @@
 # One-time setup
 
-The site works with no accounts: open the local vault as `demo` / `demo-only-public`. The steps below turn on multi-user storage and Gmail. They use only free tiers. No card, no paid API, no LLM.
+The site works with no accounts: the local screen decrypts `data/data.enc.json` with identifiant `dylan` and the password used when that file was encrypted. The fictional seed in `scripts/demo-data.mjs` is a different file and is not what the site loads. The steps below turn on multi-user storage and Gmail. They use only free tiers. No card, no paid API, no LLM.
 
 Committed config files stay empty until you paste your own public values:
 
@@ -35,9 +35,7 @@ Each account then chooses a **vault passphrase**. Google sign-in does not replac
 
 ### Import an existing vault
 
-After the passphrase step, open **Profil → Importer mon coffre existant**. Use the identifiant and password of the file (the published demo is `demo` / `demo-only-public`). Leave the file input empty to read `data/data.enc.json`, or choose another encrypted JSON. Tick **Remplacer** only if the account already has a vault. The payload is re-encrypted with the account passphrase before it is written.
-
-The published file's identifiant is `demo`. It does not open if you type a different identifiant: the username is part of the key.
+After the passphrase step, open **Profil → Importer mon coffre existant**. The identifiant field is `dylan`. Type the password of `data/data.enc.json`, leave the file input empty to read that file, or choose another encrypted JSON. Tick **Remplacer** only if the account already has a vault. The payload is re-encrypted with the account passphrase before it is written. A different identifiant cannot open the file: the username is part of the key.
 
 ## 2. Gmail (Google Cloud, testing mode)
 

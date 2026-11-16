@@ -191,7 +191,7 @@ function importBlock(ui: AppController) {
   if (!ui.cloud) {
     return h("p", { class: "muted", text: "L'import vers un compte apparaît après une connexion Firebase." });
   }
-  const username = input("demo");
+  const username = input("dylan");
   const password = h("input", { attrs: { type: "password", autocomplete: "current-password" } });
   const file = h("input", { attrs: { type: "file", accept: "application/json,.json" } });
   const replace = h("input", { attrs: { type: "checkbox" } });
