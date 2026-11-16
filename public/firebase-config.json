@@ -1,8 +1,8 @@
 {
-  "apiKey": "",
-  "authDomain": "",
-  "projectId": "",
-  "storageBucket": "",
-  "messagingSenderId": "",
-  "appId": ""
+  "apiKey": "AIzaSyAOh92xfusR9KPFqf1PJTeW7bKk7VU5JU",
+  "authDomain": "job-crm-dlnraja.firebaseapp.com",
+  "projectId": "job-crm-dlnraja",
+  "storageBucket": "job-crm-dlnraja.firebasestorage.app",
+  "messagingSenderId": "1021656979101",
+  "appId": "1:1021656979101:web:7163ee0766bfc68598e674"
 }
